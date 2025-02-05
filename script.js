@@ -1,67 +1,119 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Menu button functionality
+    const menuBtn = document.querySelector('.menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    let menuOpen = false;
+
+    if (menuBtn) {
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(!menuOpen) {
+                menuBtn.classList.add('open');
+                navLinks.classList.add('active');
+                document.body.classList.add('menu-open');
+                menuOpen = true;
+            } else {
+                menuBtn.classList.remove('open');
+                navLinks.classList.remove('active');
+                document.body.classList.remove('menu-open');
+                menuOpen = false;
+            }
+        });
+    }
+
+    // Close menu when clicking a link
+    const navLinksArray = document.querySelectorAll('.nav-links a');
+    navLinksArray.forEach(link => {
+        link.addEventListener('click', () => {
+            if (menuOpen) {
+                menuBtn.classList.remove('open');
+                navLinks.classList.remove('active');
+                document.body.classList.remove('menu-open');
+                menuOpen = false;
+            }
+        });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (menuOpen && 
+            !e.target.closest('.nav-links') && 
+            !e.target.closest('.menu-btn')) {
+            menuBtn.classList.remove('open');
+            navLinks.classList.remove('active');
+            document.body.classList.remove('menu-open');
+            menuOpen = false;
+        }
+    });
+
+    // Update menu state on window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && menuOpen) {
+            menuBtn.classList.remove('open');
+            navLinks.classList.remove('active');
+            document.body.classList.remove('menu-open');
+            menuOpen = false;
+        }
+    });
+
     // Smooth scrolling
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
-            const headerOffset = 100;
-            const elementPosition = target.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            if (target) {
+                const headerOffset = 100;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Contact form handling
+    const contactForm = document.querySelector('.contact-right form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const name = this.querySelector('input[type="text"]').value;
+            const email = this.querySelector('input[type="email"]').value;
+            const message = this.querySelector('textarea').value;
+            
+            // Basic validation
+            if (!name || !email || !message) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Here you would typically send the data to your server
+            console.log({
+                name,
+                email,
+                message
             });
+            
+            // Clear form
+            this.reset();
+            
+            // Show success message
+            alert('Message sent successfully!');
         });
-    });
-    
+    }
 
-
-
-
-
-
-
-
-
-
-
-    document.querySelector('.contact-right form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Get form values
-        const name = this.querySelector('input[type="text"]').value;
-        const email = this.querySelector('input[type="email"]').value;
-        const message = this.querySelector('textarea').value;
-        
-        // Basic validation
-        if (!name || !email || !message) {
-            alert('Please fill in all fields');
-            return;
-        }
-        
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            alert('Please enter a valid email address');
-            return;
-        }
-        
-        // Here you would typically send the data to your server
-        console.log({
-            name,
-            email,
-            message
-        });
-        
-        // Clear form
-        this.reset();
-        
-        // Show success message
-        alert('Message sent successfully!');
-    });
-    
-    // Add focus effects for form fields
+    // Form field focus effects
     const formFields = document.querySelectorAll('.contact-right input, .contact-right textarea');
     formFields.forEach(field => {
         field.addEventListener('focus', () => {
@@ -74,19 +126,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
     // Navbar background change on scroll
     const nav = document.querySelector('nav');
@@ -132,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Initial animation for timeline items
+    // Timeline animations
     const observerOptions = {
         threshold: 0.2
     };
@@ -155,12 +194,9 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(item);
     });
 
-    // Show education items by default
-    document.querySelector('[data-filter="education"]').click();
+    // Initialize timeline filter
+    const educationFilter = document.querySelector('[data-filter="education"]');
+    if (educationFilter) {
+        educationFilter.click();
+    }
 });
-
-
-
-
-
-
